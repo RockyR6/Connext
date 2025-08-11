@@ -4,54 +4,95 @@ import User from "../models/User.js";
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "my-app" });
 
-// Inngest function to save user data to a database
+// ========== CREATE ==========
 const syncUserCreation = inngest.createFunction(
     { id: 'sync-user-from-clerk' },
     { event: 'clerk/user.created' },
     async ({ event }) => {
-        const { id, first_name, last_name, email_address, image_url } = event.data;
-        let username = email_address[0].email_address.split('@')[0];
+        console.log("📦 Incoming Clerk CREATE Event:", JSON.stringify(event.data, null, 2));
 
-        // check availability of username
-        const user = await User.findOne({ username });
-        if (user) {
+        const { id, first_name, last_name, image_url } = event.data || {};
+        const emailArr = event.data?.email_addresses || [];
+        const email = emailArr.length > 0 ? emailArr[0]?.email_address : null;
+
+        if (!id || !email) {
+            console.error("❌ Missing required fields for user creation:", { id, email });
+            return;
+        }
+
+        let username = email.split('@')[0];
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
             username = username + Math.floor(Math.random() * 10000);
         }
 
         const userData = {
             _id: id,
-            email: email_address[0].email_address,
-            full_name: first_name + " " + last_name,
-            profile_picture: image_url,
+            email,
+            full_name: `${first_name || ""} ${last_name || ""}`.trim(),
+            profile_picture: image_url || "",
             username
         };
-        await User.create(userData);
+
+        try {
+            await User.create(userData);
+            console.log("✅ User created in DB:", userData);
+        } catch (err) {
+            console.error("❌ Error creating user in DB:", err.message);
+        }
     }
 );
 
-// Inngest function to update user data
+// ========== UPDATE ==========
 const syncUserUpdation = inngest.createFunction(
     { id: 'update-user-from-clerk' },
     { event: 'clerk/user.updated' },
     async ({ event }) => {
-        const { id, first_name, last_name, email_address, image_url } = event.data;
+        console.log("📦 Incoming Clerk UPDATE Event:", JSON.stringify(event.data, null, 2));
+
+        const { id, first_name, last_name, image_url } = event.data || {};
+        const emailArr = event.data?.email_addresses || [];
+        const email = emailArr.length > 0 ? emailArr[0]?.email_address : null;
+
+        if (!id) {
+            console.error("❌ Missing user ID for update:", event.data);
+            return;
+        }
 
         const updatedUserData = {
-            email: email_address[0].email_address,
-            full_name: first_name + ' ' + last_name,
-            profile_picture: image_url
+            ...(email && { email }),
+            full_name: `${first_name || ""} ${last_name || ""}`.trim(),
+            profile_picture: image_url || ""
         };
-        await User.findByIdAndUpdate(id, updatedUserData);
+
+        try {
+            await User.findByIdAndUpdate(id, updatedUserData);
+            console.log("✅ User updated in DB:", updatedUserData);
+        } catch (err) {
+            console.error("❌ Error updating user in DB:", err.message);
+        }
     }
 );
 
-// Inngest function to delete user from database
+// ========== DELETE ==========
 const syncUserDeletion = inngest.createFunction(
     { id: 'delete-user-from-clerk' },
-    { event: 'clerk/user.deleted' }, // fixed event name here
+    { event: 'clerk/user.deleted' }, // ensure correct event name
     async ({ event }) => {
-        const { id } = event.data;
-        await User.findByIdAndDelete(id);
+        console.log("📦 Incoming Clerk DELETE Event:", JSON.stringify(event.data, null, 2));
+
+        const { id } = event.data || {};
+        if (!id) {
+            console.error("❌ Missing user ID for deletion:", event.data);
+            return;
+        }
+
+        try {
+            await User.findByIdAndDelete(id);
+            console.log("🗑️ User deleted from DB:", id);
+        } catch (err) {
+            console.error("❌ Error deleting user in DB:", err.message);
+        }
     }
 );
 
