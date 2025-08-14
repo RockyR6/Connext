@@ -1,17 +1,32 @@
 import React, { useState } from 'react'
-import { dummyUserData } from '../assets/assets'
 import { Image, X } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useSelector } from 'react-redux'
+
 
 const CreatePost = () => {
   const [content, setContent] = useState('')
   const [images, setImages] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const user = dummyUserData;
+  const user = useSelector((state) =>state.user.value)
 
   const handleSubmit = async () => {
+    // Don't set loading here - let toast.promise handle it
     
+    // Your post creation logic here
+    // Example:
+    // const response = await createPost({ content, images })
+    // return response
+    
+    // For now, simulate an API call
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    
+    // Reset form after successful submission
+    setContent('')
+    setImages([])
+    
+    return "Post created successfully"
   }
 
   return (
@@ -55,17 +70,27 @@ const CreatePost = () => {
             <label htmlFor="images" className='flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition cursor-pointer'>
               <Image className='size-6'/>
             </label>
-            <input type="file" id='images' accept='image/*' hidden multiple onChange={(e)=>setImages([...images, ...e.target.files])}/>
+            <input type="file" id='images' accept='image/*' hidden multiple onChange={(e)=>setImages([...images, ...Array.from(e.target.files)])}/>
 
-            <button disabled={loading} onClick={()=> toast.promise(
-              handleSubmit(),
-              {
-                loading:'uploading...',
-                success: <p>Post Added</p>,
-                error: <p>Post Not Added</p>,
-                
+            <button disabled={isSubmitting || (!content.trim() && images.length === 0)} onClick={async ()=> {
+              if (isSubmitting) return
+              
+              setIsSubmitting(true)
+              try {
+                await toast.promise(
+                  handleSubmit(),
+                  {
+                    loading:'Uploading...',
+                    success: 'Post Added Successfully!',
+                    error: 'Failed to create post',
+                  }
+                )
+              } catch (error) {
+                console.error('Post creation failed:', error)
+              } finally {
+                setIsSubmitting(false)
               }
-            )}
+            }}
             className='text-sm bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 active:scale-95 transition text-white font-medium px-8 py-2 rounded-md cursor-pointer'>
               Publish post
             </button>
