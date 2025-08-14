@@ -6,6 +6,9 @@ import { inngest, functions } from './inngest/index.js';
 import { serve } from 'inngest/express';
 import { clerkMiddleware } from '@clerk/express'
 import userRouter from './routes/userRoutes.js';
+import postRouter from './routes/postRoutes.js';
+import storyRouter from './routes/storyRoutes.js';
+import messageRouter from './routes/messageRoutes.js';
 
 const app = express();
 
@@ -16,6 +19,10 @@ app.use(clerkMiddleware())
 // Root route
 app.get('/', (req, res) => res.send('Server is running'));
 app.use('/api/user', userRouter)
+app.use('/api/post', postRouter)
+app.use('/api/story', storyRouter)
+app.use('/api/message', messageRouter)
+
 
 // Start server after DB connection
 const startServer = async () => {
