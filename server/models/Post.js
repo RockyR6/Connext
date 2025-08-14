@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema({
     user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,  // Changed from ObjectId to String for Clerk
         required: true
     },
     content: {
@@ -18,8 +17,7 @@ const postSchema = new mongoose.Schema({
         required: true
     },
     likes_count: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        type: String,  // Changed from ObjectId to String for Clerk
     }],
 }, {timestamps: true, minimize: false})
 

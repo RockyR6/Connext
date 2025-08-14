@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 
 const storySchema = new mongoose.Schema({
     user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,  // Changed from ObjectId to String for Clerk
         required: true
     },
     content: {
@@ -17,8 +16,7 @@ const storySchema = new mongoose.Schema({
         enum: ['text', 'image', 'video'],
     },
     views_count: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        type: String,  // Changed from ObjectId to String for Clerk
     }],
     background_color: {
         type: String,

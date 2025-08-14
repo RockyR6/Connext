@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true  // Recommended to make email unique
+        unique: true
     },
     full_name: {
         type: String,
@@ -36,15 +36,15 @@ const userSchema = new mongoose.Schema({
     },
     followers: [{ 
         type: String, 
-        ref: 'User' 
+        ref: 'User'  // This ref will work since _id is String
     }],
     following: [{ 
         type: String, 
-        ref: 'User' 
+        ref: 'User'  // This ref will work since _id is String
     }],
     connections: [{ 
         type: String, 
-        ref: 'User' 
+        ref: 'User'  // This ref will work since _id is String
     }]
 }, { timestamps: true, minimize: false });
 

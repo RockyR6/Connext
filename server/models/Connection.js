@@ -2,13 +2,11 @@ import mongoose from "mongoose";
 
 const connectionSchema = new mongoose.Schema({
     from_user_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,  // Changed from ObjectId to String for Clerk
         required: true,
     },
     to_user_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,  // Changed from ObjectId to String for Clerk
         required: true,
     },
     status: {
