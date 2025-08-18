@@ -5,24 +5,26 @@ import fs from 'fs'
 import Connection from "../models/Connection.js"
 import Post from "../models/Post.js"
 import { inngest } from "../inngest/index.js"
+import { clerkClient } from "@clerk/clerk-sdk-node";
 
 
 //get user data using userId
+
+
 export const getUserData = async (req, res) => {
     try {
-        const { userId } = req.auth();
-
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.json({ success: false, message: "User not found" });
+        const {userId} = req.auth()
+        const user = await User.findById(userId)
+        if(!user){
+            return res.json({success: false, message: "User not found"})
         }
-
-        res.json({ success: true, user });
+        res.json({success: true, user})
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: error.message });
+        console.error(error);
+        res.status(500).json({ success: false, message: error.message });
     }
 };
+
 
 
 //update user data

@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema({
     user: {
-        type: String,  // Changed from ObjectId to String for Clerk
+        type: String, 
+        ref: 'User', 
         required: true
     },
     content: {

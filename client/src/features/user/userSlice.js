@@ -5,26 +5,21 @@ import toast from 'react-hot-toast'
 
 const initialState = {
   value: null,
-  loading: false,
-  error: null
 };
 
 export const fetchUser = createAsyncThunk(
   'user/fetchUser',
-  async (token, { rejectWithValue }) => {
-    try {
+  async (token) => {
+    
       const { data } = await api.get('/api/user/data', {
         headers: { Authorization: `Bearer ${token}` }
       })
 
-      if (!data.success) {
-        return rejectWithValue(data.message || 'User fetch failed')
-      }
+      
 
-      return data.user
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || err.message)
-    }
+      return data.success ? data.user : null
+     
+    
   }
 )
 
@@ -51,17 +46,8 @@ const userSlice = createSlice({
     },
     extraReducers: (builder) => {
   builder
-    .addCase(fetchUser.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
     .addCase(fetchUser.fulfilled, (state, action) => {
-      state.loading = false;
       state.value = action.payload;
-    })
-    .addCase(fetchUser.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.error.message;
     })
     .addCase(updateUser.fulfilled, (state, action) => {
       state.value = action.payload;

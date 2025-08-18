@@ -1,4 +1,5 @@
-import { Route, Routes } from "react-router-dom";
+// App.jsx
+import { Route, Routes, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Feed from "./pages/Feed";
 import Messages from "./pages/Messages";
@@ -13,84 +14,55 @@ import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { fetchUser } from "./features/user/userSlice";
-import { useSelector } from "react-redux";
-import Loading from "./components/Loading";
-import api from "./api/axios";
 
-const App = () => {
-  const { user } = useUser();
+export default function App() {
+  const { user, isLoaded, isSignedIn } = useUser();
   const { getToken } = useAuth();
   const dispatch = useDispatch();
-  
- const { loading, value: currentUser, error } = useSelector((state) => state.user)
-
- useEffect(() => {
-  console.log("Redux state:", { loading, currentUser, error })
-}, [loading, currentUser, error])
 
   useEffect(() => {
-  const fetchData = async () => {
-    if (user) {
-      const token = await getToken();
-      const result = await dispatch(fetchUser(token)).unwrap();
-
-      if (!result) {
-        await api.post("/api/user/create", {
-          full_name: user.fullName,
-          email: user.primaryEmailAddress.emailAddress,
-          profile_picture: user.imageUrl
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        dispatch(fetchUser(token)); // fetch again
+    const fetchData = async () => {
+      if (isSignedIn && user) {
+        try {
+          const token = await getToken();
+          console.log("Clerk Token:", token); // debug
+          dispatch(fetchUser(token));
+        } catch (error) {
+          console.error("Token fetch error:", error);
+        }
       }
-    }
-  };
+    };
 
-  fetchData();
-}, [user, getToken, dispatch]);
+    fetchData();
+  }, [user, isSignedIn, getToken, dispatch]);
 
-
-  if (loading) {
-  return <Loading />
-}
-
-if (!currentUser) {
-  return <div className="p-10 text-center">No user found</div>
-}
-if (error || !currentUser) {
-  console.error("User fetch failed:", error)
-  return <Login />
-}
-
-  if (!user) {
-    return <Login />;
-  }
-
-  // Wait for Redux user fetch before rendering routes
-  if (loading && !currentUser) {
-    return <Loading />;
+  // Show loading screen until Clerk finishes loading
+  if (!isLoaded) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
 
   return (
     <>
       <Toaster />
       <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Feed />} />
-          <Route path="messages" element={<Messages />} />
-          <Route path="messages/:userId" element={<ChatBox />} />
-          <Route path="connections" element={<Connection />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="profile/:profileId" element={<Profile />} />
-          <Route path="create-post" element={<CreatePost />} />
-          <Route path="discover" element={<Discover />} />
-        </Route>
+        {/* Public route */}
+        {!isSignedIn && <Route path="*" element={<Login />} />}
+
+        {/* Protected routes */}
+        {isSignedIn && (
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Feed />} />
+            <Route path="messages" element={<Messages />} />
+            <Route path="messages/:userId" element={<ChatBox />} />
+            <Route path="connections" element={<Connection />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="profile/:profileId" element={<Profile />} />
+            <Route path="create-post" element={<CreatePost />} />
+            <Route path="discover" element={<Discover />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        )}
       </Routes>
     </>
   );
-};
-
-
-export default App;
+}

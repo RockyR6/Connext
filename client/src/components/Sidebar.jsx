@@ -19,7 +19,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       } transition-all duration-300 ease-in-out`}
     >
       <div className="w-full">
-        <div className="flex flex-row justify-center items-center">
+        {/* <div className="flex flex-row justify-center items-center">
           <h1
             onClick={() => navigate("/")}
             className="flex items-center ml-7 my-2 cursor-pointer "
@@ -27,7 +27,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
             <img src={assets.biglogo} alt="" className="w-7 " />
             <span className='text-purple-600 font-bold mr-12'>CONNEXT</span>
           </h1>
-        </div>
+        </div> */}
+        <div onClick={() => navigate("/")} class="flex justify-center items-center text-4xl font-bold bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent animate-pulse cursor-pointer">
+              CONNEXT
+            </div>
         <hr className="border-gray-300 mb-8" />
         <MenuItems setSidebarOpen={setSidebarOpen} />
         <Link
