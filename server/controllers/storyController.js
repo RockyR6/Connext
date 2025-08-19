@@ -65,7 +65,7 @@ export const getStories = async (req, res) => {
     const stories = await Story.find({
       user: { $in: userIds },
     })
-      .populate('user', 'username profilePic') // only populate needed fields
+      .populate('user') 
       .sort({ createdAt: -1 });
 
     res.json({

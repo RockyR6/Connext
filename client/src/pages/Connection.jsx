@@ -6,19 +6,24 @@ import {
   UserRoundPen,
   MessageSquare,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import {
-  dummyConnectionsData as connections,
-  dummyFollowersData as followers,
-  dummyFollowingData as following,
-  dummyPendingConnectionsData as pendingConnections,
-} from "../assets/assets";
+import { data, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { useAuth } from "@clerk/clerk-react";
+import { fetchConnections } from "../features/connections/connectionSlice";
+import toast from "react-hot-toast";
+import api from "../api/axios";
+
 
 const Connection = () => {
 
   const [ currentTab, setCurrentTab ] = useState('Followers')
 
   const navigate = useNavigate();
+  const {getToken} = useAuth()
+  const dispatch = useDispatch()
+
+  const {connections, pendingConnections, followers, following} = useSelector((state) => state.connections)
   
 
   const dataArray = [
@@ -27,6 +32,44 @@ const Connection = () => {
     { label: "Pending", value: pendingConnections, icon: UserRoundPen },
     { label: "Connections", value: connections, icon: UserPlus },
   ];
+
+  const handleUnfollow = async (userId) => {
+    try {
+      const { data } = await api.post('/api/user/unfollow', {id: userId}, {
+        headers: {Authorization: `Beare ${await getToken()}`}
+      })
+      if(data.success){
+        toast.success(data.message)
+        dispatch(fetchConnections(await getToken()))
+      }else{
+        toast.success(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  const acceptConnection = async (userId) => {
+    try {
+      const { data } = await api.post('/api/user/accept', {id: userId}, {
+        headers: {Authorization: `Beare ${await getToken()}`}
+      })
+      if(data.success){
+        toast.success(data.message)
+        dispatch(fetchConnections(await getToken()))
+      }else{
+        toast.success(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  useEffect(() =>{
+    getToken().then((token) =>{
+      dispatch(fetchConnections(token))
+    })
+  },[])
 
   return (
     <div className=" min-h-screen bg-slate-50">
@@ -70,7 +113,7 @@ const Connection = () => {
                   <div className=" flex-1">
                       <p className=" font-medium text-slate-700">{user.full_name}</p>
                       <p className=" text-slate-500">@{user.username}</p>
-                      <p className=" text-sm text-gray-600">{user.bio.slice(0, 30)}...</p>
+                      <p className=" text-sm text-gray-600"> {user.bio ? user.bio.slice(0, 30) + "..." : "No bio available"}</p>
                       <div className=" flex max-sm:flex-col gap-2 mt-4">
                           <button onClick={() => navigate(`/profile/${user._id}`)}
                           className=" w-full p-2 text-sm rounded bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 active:scale-95 transition text-white cursor-pointer">
@@ -78,12 +121,14 @@ const Connection = () => {
                           </button>
                          {
                           currentTab === 'Following' && (
-                            <button className=" w-full p-2 text-sm rounded bg-slate-100 hover:bg-slate-200 text-black active:scale-95 transition cursor-pointer">Unfollow</button>
+                            <button onClick={() => handleUnfollow(user._id)}
+                            className=" w-full p-2 text-sm rounded bg-slate-100 hover:bg-slate-200 text-black active:scale-95 transition cursor-pointer">Unfollow</button>
                           )
                          }
                          {
                           currentTab === 'Pending' && (
-                            <button className=" w-full p-2 text-sm rounded bg-slate-100 hover:bg-slate-200 text-black active:scale-95 transition cursor-pointer">Accept</button>
+                            <button onClick={() => acceptConnection(user._id)}
+                            className=" w-full p-2 text-sm rounded bg-slate-100 hover:bg-slate-200 text-black active:scale-95 transition cursor-pointer">Accept</button>
                           )
                          }
                          {

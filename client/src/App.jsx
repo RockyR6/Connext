@@ -14,6 +14,7 @@ import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { fetchUser } from "./features/user/userSlice";
+import { fetchConnections } from "./features/connections/connectionSlice";
 
 export default function App() {
   const { user, isLoaded, isSignedIn } = useUser();
@@ -25,8 +26,9 @@ export default function App() {
       if (isSignedIn && user) {
         try {
           const token = await getToken();
-          console.log("Clerk Token:", token); // debug
+          // console.log("Clerk Token:", token); // debug
           dispatch(fetchUser(token));
+          dispatch(fetchConnections(token))
         } catch (error) {
           console.error("Token fetch error:", error);
         }
