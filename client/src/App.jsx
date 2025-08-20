@@ -1,5 +1,5 @@
 // App.jsx
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import Login from "./pages/Login";
 import Feed from "./pages/Feed";
 import Messages from "./pages/Messages";
@@ -10,15 +10,21 @@ import Profile from "./pages/Profile";
 import Layout from "./pages/Layout";
 import CreatePost from "./pages/CreatePost";
 import { useUser, useAuth } from "@clerk/clerk-react";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { fetchUser } from "./features/user/userSlice";
 import { fetchConnections } from "./features/connections/connectionSlice";
+import { useRef } from "react";
+import { addMessage } from "./features/messages/messageSlice";
+import NotificationCard from "./components/NotificationCard";
 
 export default function App() {
   const { user, isLoaded, isSignedIn } = useUser();
   const { getToken } = useAuth();
+  const { pathname } = useLocation()
+  const pathnameRef = useRef(pathname)
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -37,6 +43,31 @@ export default function App() {
 
     fetchData();
   }, [user, isSignedIn, getToken, dispatch]);
+
+  useEffect(() => {
+    pathnameRef.current = pathname
+  },[pathname])
+
+  useEffect(() => {
+    if(user){
+      const eventSource = new EventSource(import.meta.env.VITE_BASEURL + '/api/message/' + user.id)
+
+      eventSource.onmessage = (event)=> {
+        const message = JSON.parse(event.data)
+
+        if(pathnameRef.current === ('/messages/' + message.from_user_id._id)){
+          dispatch(addMessage(message))
+        }else{
+          toast.custom((t) => (
+            <NotificationCard t={t} message={message}/>
+          ), {position: "bottom-right"})
+        }
+      }
+      return () => {
+        eventSource.close()
+      }
+    }
+  }, [user, dispatch])
 
   // Show loading screen until Clerk finishes loading
   if (!isLoaded) {

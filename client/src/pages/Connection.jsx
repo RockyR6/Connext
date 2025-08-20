@@ -20,11 +20,17 @@ const Connection = () => {
   const [ currentTab, setCurrentTab ] = useState('Followers')
 
   const navigate = useNavigate();
-  const {getToken} = useAuth()
+  const { getToken } = useAuth()
   const dispatch = useDispatch()
 
-  const {connections, pendingConnections, followers, following} = useSelector((state) => state.connections)
-  
+  // const {connections, pendingConnections, followers, following} = useSelector((state) => state.connections)
+  const {
+  connections = [],
+  pendingConnections = [],
+  followers = [],
+  following = []
+} = useSelector((state) => state.connections)
+
 
   const dataArray = [
     { label: "Followers", value: followers, icon: Users },
@@ -52,13 +58,13 @@ const Connection = () => {
   const acceptConnection = async (userId) => {
     try {
       const { data } = await api.post('/api/user/accept', {id: userId}, {
-        headers: {Authorization: `Beare ${await getToken()}`}
+        headers: {Authorization: `Bearer ${await getToken()}`}
       })
       if(data.success){
         toast.success(data.message)
         dispatch(fetchConnections(await getToken()))
       }else{
-        toast.success(data.message)
+        toast.error(data.message)
       }
     } catch (error) {
       toast.error(error.message)
