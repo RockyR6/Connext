@@ -13,21 +13,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const { signOut } = useClerk();
 
   return (
-    <div
-      className={`w-60 xl:w-60 h-screen bg-white border-r border-gray-200 flex flex-col justify-between max-sm:absolute top-0 bottom-0 z-20 ${
-        sidebarOpen ? "translate-x-0" : "max-sm:translate-x-full"
-      } transition-all duration-300 ease-in-out`}
-    >
+   <div
+  className={`w-60 xl:w-60 h-screen bg-white border-r border-gray-200 flex flex-col justify-between
+  transition-transform duration-300 ease-in-out
+  ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} 
+  sm:translate-x-0 sm:relative sm:block
+  absolute top-0 bottom-0 z-20`}
+>
+
+
+
       <div className="w-full">
-        {/* <div className="flex flex-row justify-center items-center">
-          <h1
-            onClick={() => navigate("/")}
-            className="flex items-center ml-7 my-2 cursor-pointer "
-          >
-            <img src={assets.biglogo} alt="" className="w-7 " />
-            <span className='text-purple-600 font-bold mr-12'>CONNEXT</span>
-          </h1>
-        </div> */}
         <div onClick={() => navigate("/")} class="flex justify-center items-center text-4xl font-bold bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent animate-pulse cursor-pointer">
               CONNEXT
             </div>
