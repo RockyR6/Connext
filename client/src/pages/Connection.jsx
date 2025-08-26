@@ -23,7 +23,6 @@ const Connection = () => {
   const { getToken } = useAuth()
   const dispatch = useDispatch()
 
-  // const {connections, pendingConnections, followers, following} = useSelector((state) => state.connections)
   const {
   connections = [],
   pendingConnections = [],

@@ -36,15 +36,15 @@ const userSchema = new mongoose.Schema({
     },
     followers: [{ 
         type: String, 
-        ref: 'User'  // This ref will work since _id is String
+        ref: 'User' 
     }],
     following: [{ 
         type: String, 
-        ref: 'User'  // This ref will work since _id is String
+        ref: 'User' 
     }],
     connections: [{ 
         type: String, 
-        ref: 'User'  // This ref will work since _id is String
+        ref: 'User'
     }]
 }, { timestamps: true, minimize: false });
 

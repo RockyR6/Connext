@@ -1,11 +1,9 @@
-import { response } from "express";
 import imagekit from "../config/imageKit.js";
 import User from "../models/User.js";
 import fs from "fs";
 import Connection from "../models/Connection.js";
 import Post from "../models/Post.js";
 import { inngest } from "../inngest/index.js";
-import { clerkClient } from "@clerk/clerk-sdk-node";
 
 // get user data using userId
 export const getUserData = async (req, res) => {
@@ -218,7 +216,8 @@ export const sendConnectionRequest = async (req, res) => {
     if (connectionRequests.length >= 20) {
       return res.json({
         success: false,
-        message: "You have sent more than 20 connection requests in the last 24 hours",
+        message:
+          "You have sent more than 20 connection requests in the last 24 hours",
       });
     }
 
@@ -266,7 +265,7 @@ export const sendConnectionRequest = async (req, res) => {
   }
 };
 
-// get user connections (✅ FIXED)
+// get user connections
 export const getUserConnections = async (req, res) => {
   try {
     const { userId } = req.auth();
@@ -286,7 +285,7 @@ export const getUserConnections = async (req, res) => {
     const followers = user.followers;
     const following = user.following;
 
-    // ✅ get pending requests for current user
+    //get pending requests for current user
     const pendingConnections = await Connection.find({
       to_user_id: userId,
       status: "pending",
@@ -304,7 +303,7 @@ export const getUserConnections = async (req, res) => {
   }
 };
 
-// accept connection request (✅ FIXED)
+// accept connection request
 export const acceptConnecctionRequest = async (req, res) => {
   try {
     const { userId } = req.auth();
@@ -329,7 +328,7 @@ export const acceptConnecctionRequest = async (req, res) => {
 
     const toUser = await User.findById(id);
     toUser.connections.push(userId);
-    await toUser.save(); // ✅ fixed (was saving wrong user before)
+    await toUser.save(); 
 
     connection.status = "accepted";
     await connection.save();

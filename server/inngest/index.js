@@ -10,14 +10,14 @@ export const inngest = new Inngest({ id: "my-app" });
 
 // ========== CREATE ==========
 const syncUserCreation = inngest.createFunction(
-  { id: "sync-user-from-clerk" },
-  { event: "clerk/user.created" },
+  { id: "sync-user-from-clerk" }, // Unique function ID
+  { event: "clerk/user.created" },  // Listens for Clerk webhook
   async ({ event }) => {
     console.log(
       "Incoming Clerk CREATE Event:",
       JSON.stringify(event.data, null, 2)
     );
-
+    // Extract data from Clerk webhook
     const { id, first_name, last_name, image_url } = event.data || {};
     const emailArr = event.data?.email_addresses || [];
     const email = emailArr.length > 0 ? emailArr[0]?.email_address : null;
@@ -29,15 +29,15 @@ const syncUserCreation = inngest.createFunction(
       });
       return;
     }
-
+    // Generate unique username
     let username = email.split("@")[0];
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       username = username + Math.floor(Math.random() * 10000);
     }
-
+    // Create user in MongoDB
     const userData = {
-      _id: id,
+      _id: id,  // Use Clerk ID as MongoDB _id
       email,
       full_name: `${first_name || ""} ${last_name || ""}`.trim(),
       profile_picture: image_url || "",
@@ -45,7 +45,7 @@ const syncUserCreation = inngest.createFunction(
     };
 
     try {
-      await User.create(userData);
+      await User.create(userData); // Save to MongoDB
       console.log("User created in DB:", userData);
     } catch (err) {
       console.error("Error creating user in DB:", err.message);

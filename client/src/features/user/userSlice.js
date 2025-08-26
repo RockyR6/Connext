@@ -23,8 +23,6 @@ export const fetchUser = createAsyncThunk(
   }
 )
 
-
-
 export const updateUser = createAsyncThunk('user/update', async({userData, token}) => {
     const { data } = await api.post('/api/user/update', userData, {
         headers: {Authorization: `Bearer ${token}`}
