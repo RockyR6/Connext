@@ -1,32 +1,29 @@
-import { assets,} from "../assets/assets";
 import { Link, useNavigate } from "react-router-dom";
 import MenuItems from "./MenuItems";
 import { CirclePlus, LogOut } from "lucide-react";
 import { UserButton, useClerk } from "@clerk/clerk-react";
-import { useSelector } from 'react-redux'
-
-
+import { useSelector } from "react-redux";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate();
-  const user = useSelector((state) =>state.user.value)
+  const user = useSelector((state) => state.user.value);
   const { signOut } = useClerk();
 
   return (
-   <div
-  className={`w-60 xl:w-60 h-screen bg-white border-r border-gray-200 flex flex-col justify-between
+    <div
+      className={`w-60 xl:w-60 h-screen bg-white border-r border-gray-200 flex flex-col justify-between
   transition-transform duration-300 ease-in-out
   ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} 
   sm:translate-x-0 sm:relative sm:block
   absolute top-0 bottom-0 z-20`}
->
-
-
-
+    >
       <div className="w-full">
-        <div onClick={() => navigate("/")} class="flex justify-center items-center text-4xl font-bold bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent animate-pulse cursor-pointer">
-              CONNEXT
-            </div>
+        <div
+          onClick={() => navigate("/")}
+          class="flex justify-center items-center text-4xl font-bold bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent animate-pulse cursor-pointer"
+        >
+          CONNEXT
+        </div>
         <hr className="border-gray-300 mb-8" />
         <MenuItems setSidebarOpen={setSidebarOpen} />
         <Link

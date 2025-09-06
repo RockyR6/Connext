@@ -81,7 +81,7 @@ const StoryModal = ({ setShowModal, fetchStories }) => {
     formData.append("media_type", media_type);
     formData.append("background_color", background);
 
-    // ✅ append file if exists
+    //append file if exists
     if (mode === "media" && media) {
       formData.append("media", media);
     }
